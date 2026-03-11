@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iexport-backend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-5020}:5020"
+    env_file:
+      - .env
+    volumes:
+      # Persist uploaded files (hero, categories, products, certificates, about, showcase)
+      - uploads_data:/app/uploads
+    # Optional: use if you run MongoDB in Docker instead of Atlas
+    # depends_on:
+    #   - mongo
+
+  # Uncomment below to run MongoDB on the VPS instead of using Atlas.
+  # Then set MONGO_URI=mongodb://mongo:27017/iexport in .env
+  # mongo:
+  #   image: mongo:7
+  #   container_name: iexport-mongo
+  #   restart: unless-stopped
+  #   volumes:
+  #     - mongo_data:/data/db
+  #   ports:
+  #     - "27017:27017"
+
+volumes:
+  uploads_data:
+  # mongo_data:
