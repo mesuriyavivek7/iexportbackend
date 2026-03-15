@@ -13,6 +13,7 @@ import showcaseRoutes from "./routes/showcase.route";
 import certificateRoutes from "./routes/certificate.route";
 import contactUsRoutes from "./routes/contactUs.route";
 import leadRoutes from "./routes/lead.route";
+import analyticsRoute from './routes/analytics.routes'
 
 const app: Application = express();
 
@@ -43,5 +44,6 @@ app.use("/api/showcase", showcaseRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/contact-us", contactUsRoutes);
 app.use("/api/leads", leadRoutes);
+app.use("/api/analytics", analyticsRoute)
 
 export default app;
