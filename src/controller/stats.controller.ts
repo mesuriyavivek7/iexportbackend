@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import statsSectionModel from "../models/statsSection.model";
-import { revalidateNextjs } from "../utils/revalidate";
 
 export const getStats = async (_req: Request, res: Response) => {
   try {
@@ -33,7 +32,6 @@ export const createStats = async (req: Request, res: Response) => {
           }
         : {}
     );
-    await revalidateNextjs({ tag: "home" });
     return res.status(201).json({ message: "Stats section created.", success: true, data: doc.toObject() });
   } catch (err) {
     console.error("Create stats error:", err);
@@ -54,7 +52,6 @@ export const updateStats = async (req: Request, res: Response) => {
       }));
     }
     await doc.save();
-    await revalidateNextjs({ tag: "home" });
     return res.status(200).json({ message: "Stats section updated.", success: true, data: doc.toObject() });
   } catch (err) {
     console.error("Update stats error:", err);

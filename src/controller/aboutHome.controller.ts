@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
 import aboutHomeModel from "../models/aboutHome.model";
-import { revalidateNextjs } from "../utils/revalidate";
-
 const UPLOAD_DIR = path.join(process.cwd(), "uploads", "about");
 const BASE_URL = (process.env.BASE_URL || "http://localhost:5020").replace(/\/$/, "");
 
@@ -53,7 +51,6 @@ export const createAboutHome = async (req: Request, res: Response) => {
       ...(contentParagraph1 !== undefined && { contentParagraph1 }),
       ...(contentParagraph2 !== undefined && { contentParagraph2 }),
     });
-    await revalidateNextjs({ tag: "home" });
     return res.status(201).json({ message: "About Home section created.", success: true, data: toResponse(doc) });
   } catch (err) {
     console.error("Create about home error:", err);
@@ -84,7 +81,6 @@ export const updateAboutHome = async (req: Request, res: Response) => {
       doc.aboutImage = `${BASE_URL}/uploads/about/${file.filename}`;
     }
     await doc.save();
-    await revalidateNextjs({ tag: "home" });
     return res.status(200).json({ message: "About Home updated successfully.", success: true, data: toResponse(doc) });
   } catch (err) {
     console.error("Update about home error:", err);

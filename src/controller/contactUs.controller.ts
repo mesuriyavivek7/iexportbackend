@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import contactUsModel from "../models/contactUs.model";
-import { revalidateNextjs } from "../utils/revalidate";
-
 function parseContactPersons(value: unknown): { name: string; mobileNo: string }[] | undefined {
   if (!Array.isArray(value) || value.length < 2) return undefined;
   return value.slice(0, 2).map((item) => {
@@ -90,7 +88,6 @@ export const createContactUs = async (req: Request, res: Response) => {
       ...(points && { points }),
       ...(socialLinks && { socialLinks }),
     });
-    await revalidateNextjs({ tag: "contact" });
     return res.status(201).json({ message: "Contact Us section created.", success: true, data: doc.toObject() });
   } catch (err) {
     console.error("Create contact us error:", err);
@@ -114,7 +111,6 @@ export const updateContactUs = async (req: Request, res: Response) => {
     if (socialLinks) doc.socialLinks = socialLinks;
 
     await doc.save();
-    await revalidateNextjs({ tag: "contact" });
     return res.status(200).json({ message: "Contact Us section updated.", success: true, data: doc.toObject() });
   } catch (err) {
     console.error("Update contact us error:", err);

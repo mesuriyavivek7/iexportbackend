@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
 import certificateModel from "../models/certificate.model";
-import { revalidateNextjs } from "../utils/revalidate";
-
 const UPLOAD_DIR = path.join(process.cwd(), "uploads", "certificates");
 const BASE_URL = (process.env.BASE_URL || "http://localhost:5020").replace(/\/$/, "");
 
@@ -37,7 +35,6 @@ export const createCertificate = async (req: Request, res: Response) => {
     if (!file) return res.status(400).json({ message: "Certificate image is required.", success: false });
     const image = `${BASE_URL}/uploads/certificates/${file.filename}`;
     const certificate = await certificateModel.create({ image });
-    await revalidateNextjs({ tag: "home" });
     const data = { ...certificate.toObject(), image: toFullImageUrl(certificate.image) };
     return res.status(201).json({ message: "Certificate added.", success: true, data });
   } catch (err) {
@@ -58,7 +55,6 @@ export const deleteCertificate = async (req: Request, res: Response) => {
       }
     }
     await certificateModel.findByIdAndDelete(req.params.id);
-    await revalidateNextjs({ tag: "home" });
     return res.status(200).json({ message: "Certificate deleted.", success: true });
   } catch (err) {
     console.error("Delete certificate error:", err);

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import categoriesPageModel from "../models/categoriesPage.model";
-import { revalidateNextjs } from "../utils/revalidate";
 
 export const getCategoriesPage = async (_req: Request, res: Response) => {
   try {
@@ -27,7 +26,6 @@ export const createCategoriesPage = async (req: Request, res: Response) => {
       heading: heading !== undefined ? String(heading) : "Our Categories",
       subheading: subheading !== undefined ? String(subheading) : "Browse our range of premium products by category.",
     });
-    await revalidateNextjs({ tag: "categories" });
     return res.status(201).json({ message: "Categories page created.", success: true, data: doc.toObject() });
   } catch (err) {
     console.error("Create categories page error:", err);
@@ -43,7 +41,6 @@ export const updateCategoriesPage = async (req: Request, res: Response) => {
     if (heading !== undefined) doc.heading = String(heading);
     if (subheading !== undefined) doc.subheading = String(subheading);
     await doc.save();
-    await revalidateNextjs({ tag: "categories" });
     return res.status(200).json({ message: "Categories page updated.", success: true, data: doc.toObject() });
   } catch (err) {
     console.error("Update categories page error:", err);

@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import heroModel from "../models/hero.model";
 import path from "path";
 import fs from "fs";
-import { revalidateNextjs } from "../utils/revalidate";
-
 const UPLOAD_DIR = path.join(process.cwd(), "uploads", "hero");
 const BASE_URL = (process.env.BASE_URL || "http://localhost:5020").replace(/\/$/, "");
 
@@ -68,7 +66,6 @@ export const createHero = async (req: Request, res: Response) => {
     });
     const data = hero.toObject();
     data.heroImage = toFullImageUrl(hero.heroImage);
-    await revalidateNextjs({ tag: "home" });
     return res.status(201).json({ message: "Hero section created.", success: true, data });
   } catch (err) {
     console.error("Create hero error:", err);
@@ -102,7 +99,6 @@ export const updateHero = async (req: Request, res: Response) => {
     }
 
     await hero.save();
-    await revalidateNextjs({ tag: "home" });
     const data = hero.toObject();
     data.heroImage = toFullImageUrl(hero.heroImage);
     return res.status(200).json({ message: "Hero updated successfully.", success: true, data });

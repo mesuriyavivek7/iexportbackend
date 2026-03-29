@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
 import showcaseSectionModel from "../models/showcaseSection.model";
-import { revalidateNextjs } from "../utils/revalidate";
-
 const UPLOAD_DIR = path.join(process.cwd(), "uploads", "showcase");
 const BASE_URL = (process.env.BASE_URL || "http://localhost:5020").replace(/\/$/, "");
 
@@ -85,7 +83,6 @@ export const createShowcase = async (req: Request, res: Response) => {
       paragraph: body.paragraph !== undefined ? String(body.paragraph) : undefined,
       ...(points !== undefined && { points }),
     });
-    await revalidateNextjs({ tag: "home" });
     return res.status(201).json({ message: "Showcase section created.", success: true, data: toResponse(doc) });
   } catch (err) {
     console.error("Create showcase error:", err);
@@ -122,7 +119,6 @@ export const updateShowcase = async (req: Request, res: Response) => {
     }
 
     await doc.save();
-    await revalidateNextjs({ tag: "home" });
     return res.status(200).json({ message: "Showcase section updated.", success: true, data: toResponse(doc) });
   } catch (err) {
     console.error("Update showcase error:", err);

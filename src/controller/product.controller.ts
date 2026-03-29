@@ -3,8 +3,6 @@ import path from "path";
 import fs from "fs";
 import productModel from "../models/product.model";
 import categoryModel from "../models/category.model";
-import { revalidateNextjs } from "../utils/revalidate";
-
 const UPLOAD_DIR = path.join(process.cwd(), "uploads", "products");
 const BASE_URL = (process.env.BASE_URL || "http://localhost:5020").replace(/\/$/, "");
 
@@ -95,7 +93,6 @@ export const createProduct = async (req: Request, res: Response) => {
     const image = file ? `${BASE_URL}/uploads/products/${file.filename}` : "";
     const product = await productModel.create({ name, image, category: categoryId });
     const populated = await product.populate("category", "name image");
-    await revalidateNextjs({ tag: "categories" });
     const data = {
       ...populated.toObject(),
       image: toFullImageUrl(populated.image),
@@ -134,7 +131,6 @@ export const updateProduct = async (req: Request, res: Response) => {
       product.image = `${BASE_URL}/uploads/products/${file.filename}`;
     }
     await product.save();
-    await revalidateNextjs({ tag: "categories" });
     const populated = await product.populate("category", "name image");
     const data = {
       ...populated.toObject(),
@@ -162,7 +158,6 @@ export const deleteProduct = async (req: Request, res: Response) => {
       }
     }
     await productModel.findByIdAndDelete(req.params.id);
-    await revalidateNextjs({ tag: "categories" });
     return res.status(200).json({ message: "Product deleted.", success: true });
   } catch (err) {
     console.error("Delete product error:", err);

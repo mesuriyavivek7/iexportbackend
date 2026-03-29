@@ -3,8 +3,6 @@ import path from "path";
 import fs from "fs";
 import categoryModel from "../models/category.model";
 import productModel from "../models/product.model";
-import { revalidateNextjs } from "../utils/revalidate";
-
 const UPLOAD_DIR = path.join(process.cwd(), "uploads", "categories");
 const PRODUCTS_UPLOAD_DIR = path.join(process.cwd(), "uploads", "products");
 const BASE_URL = (process.env.BASE_URL || "http://localhost:5020").replace(/\/$/, "");
@@ -58,8 +56,6 @@ export const createCategory = async (req: Request, res: Response) => {
     const file = req.file;
     const image = file ? `${BASE_URL}/uploads/categories/${file.filename}` : "";
     const category = await categoryModel.create({ name, image });
-    await revalidateNextjs({ tag: "home" });
-    await revalidateNextjs({ tag: "categories" });
     const data = { ...category.toObject(), image: toFullImageUrl(category.image) };
     return res.status(201).json({ message: "Category created.", success: true, data });
   } catch (err) {
@@ -86,8 +82,6 @@ export const updateCategory = async (req: Request, res: Response) => {
       category.image = `${BASE_URL}/uploads/categories/${file.filename}`;
     }
     await category.save();
-    await revalidateNextjs({ tag: "home" });
-    await revalidateNextjs({ tag: "categories" });
     const data = { ...category.toObject(), image: toFullImageUrl(category.image) };
     return res.status(200).json({ message: "Category updated.", success: true, data });
   } catch (err) {
@@ -121,8 +115,6 @@ export const deleteCategory = async (req: Request, res: Response) => {
       }
     }
     await categoryModel.findByIdAndDelete(req.params.id);
-    await revalidateNextjs({ tag: "home" });
-    await revalidateNextjs({ tag: "categories" });
     return res.status(200).json({
       message: "Category and its linked products deleted.",
       success: true,

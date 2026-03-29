@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import categorySectionModel from "../models/categorySection.model";
-import { revalidateNextjs } from "../utils/revalidate";
 
 export const getCategorySection = async (_req: Request, res: Response) => {
   try {
@@ -27,7 +26,6 @@ export const createCategorySection = async (req: Request, res: Response) => {
       heading: heading !== undefined ? String(heading) : "Crafted by Nature, Delivered with Care",
       subheading: subheading !== undefined ? String(subheading) : "Experience the finest products, sourced responsibly and delivered with uncompromising quality.",
     });
-    await revalidateNextjs({ tag: "home" });
     return res.status(201).json({ message: "Category section created.", success: true, data: doc.toObject() });
   } catch (err) {
     console.error("Create category section error:", err);
@@ -43,7 +41,6 @@ export const updateCategorySection = async (req: Request, res: Response) => {
     if (heading !== undefined) doc.heading = String(heading);
     if (subheading !== undefined) doc.subheading = String(subheading);
     await doc.save();
-    await revalidateNextjs({ tag: "home" });
     return res.status(200).json({ message: "Category section updated.", success: true, data: doc.toObject() });
   } catch (err) {
     console.error("Update category section error:", err);

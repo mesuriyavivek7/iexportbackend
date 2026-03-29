@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
 import aboutPageModel from "../models/aboutPage.model";
-import { revalidateNextjs } from "../utils/revalidate";
-
 const UPLOAD_DIR = path.join(process.cwd(), "uploads", "about");
 const BASE_URL = (process.env.BASE_URL || "http://localhost:5020").replace(/\/$/, "");
 
@@ -63,7 +61,6 @@ export const createAboutPage = async (req: Request, res: Response) => {
       ambitionTitle: s(body.ambitionTitle) || "Ambition",
       ambitionContent: s(body.ambitionContent) || "To rapidly expand our global export footprint, strengthen supplier networks, and position Procure Export as a preferred partner in international trade.",
     });
-    await revalidateNextjs({ tag: "about" });
     return res.status(201).json({ message: "About Page created.", success: true, data: toResponse(doc) });
   } catch (err) {
     console.error("Create about page error:", err);
@@ -101,7 +98,6 @@ export const updateAboutPage = async (req: Request, res: Response) => {
       doc.sectionImage = `${BASE_URL}/uploads/about/${file.filename}`;
     }
     await doc.save();
-    await revalidateNextjs({ tag: "about" });
     return res.status(200).json({ message: "About Page updated successfully.", success: true, data: toResponse(doc) });
   } catch (err) {
     console.error("Update about page error:", err);
