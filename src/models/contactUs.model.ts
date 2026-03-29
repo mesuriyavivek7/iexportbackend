@@ -13,7 +13,7 @@ export interface ISocialLinks {
 
 export interface IContactUs extends Document {
   contactPersons: IContactPerson[];
-  email: string;
+  email: string[];
   points: string[];
   socialLinks: ISocialLinks;
 }
@@ -45,8 +45,8 @@ const contactUsSchema: Schema<IContactUs> = new mongoose.Schema(
       ],
     },
     email: {
-      type: String,
-      default: "procureexport24@gmail.com",
+      type: [String],
+      default: ["procureexport24@gmail.com"],
     },
     points: {
       type: [String],
@@ -68,5 +68,37 @@ const contactUsSchema: Schema<IContactUs> = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+contactUsSchema.pre("save", function () {
+  const e = this.email as unknown;
+  if (typeof e === "string") {
+    this.email = e.trim() ? [e.trim()] : [];
+  } else if (!Array.isArray(this.email)) {
+    this.email = [];
+  }
+});
+
+/** Legacy DB rows may still have `email` as a single string */
+function normalizeEmailOnPlain(ret: { email?: unknown }): void {
+  const e = ret.email;
+  if (typeof e === "string") {
+    ret.email = e.trim() ? [e.trim()] : [];
+  } else if (!Array.isArray(e)) {
+    ret.email = [];
+  }
+}
+
+contactUsSchema.set("toJSON", {
+  transform(_doc, ret) {
+    normalizeEmailOnPlain(ret);
+    return ret;
+  },
+});
+contactUsSchema.set("toObject", {
+  transform(_doc, ret) {
+    normalizeEmailOnPlain(ret);
+    return ret;
+  },
+});
 
 export default mongoose.model<IContactUs>("ContactUs", contactUsSchema);

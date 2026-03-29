@@ -21,7 +21,7 @@ function getStoredFilename(imageUrl: string): string {
 
 export const getCategories = async (_req: Request, res: Response) => {
   try {
-    const categories = await categoryModel.find().lean();
+    const categories = await categoryModel.find().sort({ createdAt: -1 }).lean();
     const productCounts = await productModel.aggregate([
       { $group: { _id: "$category", count: { $sum: 1 } } },
     ]);

@@ -22,7 +22,11 @@ export const getProducts = async (req: Request, res: Response) => {
   try {
     const categoryId = req.query.categoryId as string | undefined;
     const filter = categoryId ? { category: categoryId } : {};
-    const products = await productModel.find(filter).populate("category", "name image").lean();
+    const products = await productModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .populate("category", "name image")
+      .lean();
     const data = products.map((p) => ({
       ...p,
       image: toFullImageUrl(p.image),
@@ -42,7 +46,11 @@ export const getProductsByCategoryId = async (req: Request, res: Response) => {
     const { categoryId } = req.params;
     const category = await categoryModel.findById(categoryId);
     if (!category) return res.status(404).json({ message: "Category not found", success: false });
-    const products = await productModel.find({ category: categoryId }).populate("category", "name image").lean();
+    const products = await productModel
+      .find({ category: categoryId })
+      .sort({ createdAt: -1 })
+      .populate("category", "name image")
+      .lean();
     const data = products.map((p) => ({
       ...p,
       image: toFullImageUrl(p.image),

@@ -36,6 +36,29 @@ function parseSocialLinks(value: unknown): { instagram: string; linkedin: string
   };
 }
 
+/** Accepts `email` as string[], JSON string array, or comma-separated string */
+function parseEmails(value: unknown): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (Array.isArray(value)) {
+    const out = value.map((x) => String(x).trim()).filter(Boolean);
+    return out;
+  }
+  if (typeof value === "string") {
+    const s = value.trim();
+    if (!s) return [];
+    try {
+      const parsed = JSON.parse(s) as unknown;
+      if (Array.isArray(parsed)) {
+        return parsed.map((x) => String(x).trim()).filter(Boolean);
+      }
+    } catch {
+      /* not JSON */
+    }
+    return s.split(",").map((x) => x.trim()).filter(Boolean);
+  }
+  return undefined;
+}
+
 export const getContactUs = async (_req: Request, res: Response) => {
   try {
     let doc = await contactUsModel.findOne();
@@ -60,9 +83,10 @@ export const createContactUs = async (req: Request, res: Response) => {
     const contactPersons = parseContactPersons(body.contactPersons);
     const points = parsePoints(body.points);
     const socialLinks = parseSocialLinks(body.socialLinks);
+    const emails = parseEmails(body.email);
     const doc = await contactUsModel.create({
       ...(contactPersons && { contactPersons }),
-      ...(body.email !== undefined && { email: String(body.email) }),
+      ...(emails !== undefined && { email: emails }),
       ...(points && { points }),
       ...(socialLinks && { socialLinks }),
     });
@@ -82,7 +106,8 @@ export const updateContactUs = async (req: Request, res: Response) => {
 
     const contactPersons = parseContactPersons(body.contactPersons);
     if (contactPersons) doc.contactPersons = contactPersons;
-    if (body.email !== undefined) doc.email = String(body.email);
+    const emails = parseEmails(body.email);
+    if (emails !== undefined) doc.email = emails;
     const points = parsePoints(body.points);
     if (points !== undefined) doc.points = points;
     const socialLinks = parseSocialLinks(body.socialLinks);
