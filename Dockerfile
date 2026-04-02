@@ -14,6 +14,9 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
+#Copy the analytics json file inside dist config folder
+RUN mkdir -p dist/config && cp src/config/*.json dist/config/
+
 # Production stage
 FROM node:20-alpine AS production
 
